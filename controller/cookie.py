@@ -50,7 +50,7 @@ def deserialize_history(json_str):
             raise ValueError("Loại message không được hỗ trợ")
         history.append(msg)
     return history
-import time
+
 def get_cookie_data():
     # Đọc cookie và load vào session_state khi ứng dụng khởi động
     user_info_cookie = get_cookie("user_info")
@@ -60,7 +60,7 @@ def get_cookie_data():
         try:
             user_info = json.loads(user_info_cookie)
             st.session_state.user_info = user_info
-            print(1)
+
         except Exception as e:
             st.error(f'Lỗi khi lấy cookie user_info: {e}')
 
@@ -68,7 +68,7 @@ def get_cookie_data():
         try:
             id_session_dict = json.loads(id_session_cookie)
             st.session_state.id_session_dict = id_session_dict
-            print(2)
+
         except Exception as e:
             st.error(f'Lỗi khi lấy cookie id_session: {e}')
 
