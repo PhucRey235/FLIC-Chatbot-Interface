@@ -174,7 +174,7 @@ def setup_chat_interface():
                     
                 with col2:        
                     if st.button("Gặp nhân viên", key = 'button_setup_interface'):
-                        loi_nhan_tu_dong = 'Cảm ơn Quý khách đã liên hệ. Yêu cầu của Quý khách sẽ được chuyển đến nhân viên hỗ trợ. Vui lòng chờ trong giây lát để được phản hồi. Chúng tôi rất trân trọng sự kiên nhẫn của Quý khách.'
+                        loi_nhan_tu_dong = 'Cảm ơn bạn đã để lại yêu cầu. Hệ thống đã ghi nhận và sẽ chuyển tiếp đến nhân viên hỗ trợ trong thời gian sớm nhất. Thời gian làm việc của nhân viên là từ Thứ Hai đến Thứ Sáu, 7h đến 11h và 13h đến 17h. Rất mong bạn thông cảm nếu phản hồi có thể chậm ngoài khung giờ này.'
                         st.session_state.agent_history.append(AIMessage(content=loi_nhan_tu_dong))
                         
                         save_yeu_cau_nhan_vien(loi_nhan_tu_dong)
