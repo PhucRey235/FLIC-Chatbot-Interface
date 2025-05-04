@@ -1,0 +1,6 @@
+# Ignore files 
+.env
+
+test.py
+
+test.ipynb
