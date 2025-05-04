@@ -32,8 +32,8 @@ def get_thong_tin_hoc_vien(phone):
         result = ast.literal_eval(result)  # Chuyển về list chuẩn
         return dict(zip(columns, result[0]))
         
+    # Không phải là Học viên FLIC, trả về rỗng
     except Exception as e:
-        print("Lỗi khi eval kết quả BigQuery:", e)
         return {}
     
 @st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)

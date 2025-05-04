@@ -25,7 +25,6 @@ def clear_on_snapshot_state():
     st.session_state.gap_nhan_vien = False
     try:
         save_tat_yeu_cau_nhan_vien()
-        print('đã xóa hết')
     except Exception:
         pass
 

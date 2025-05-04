@@ -115,7 +115,6 @@ def setup_feedback_dialog():
         submit_button = st.form_submit_button(label='Gửi')
         
         if submit_button:
-            print(st.session_state.feedback_log_in_dialog_display)
             # Lưu vào database
             save_feedback(feedback_type, feedback_content)
             

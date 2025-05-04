@@ -58,7 +58,6 @@ def main():
         st.session_state.agent_history = setup_chat_interface()  # Thiết lập giao diện chat
         
     elif "agent_history" in st.session_state and st.session_state.get('gap_nhan_vien', False):
-        st.write('oke rồi nè')
         start_chat_monitoring()
         process_queue_and_update_state()
         
