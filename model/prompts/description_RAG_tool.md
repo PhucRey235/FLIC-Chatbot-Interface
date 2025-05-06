@@ -1,25 +1,27 @@
 
-# Công cụ tìm kiếm thông tin trung tâm từ hệ thống RAG (MongoDB)
+# Công cụ RAG – Tìm Kiếm Thông Tin Trung Tâm (MongoDB)
 
-**Chức năng:**
+**Chức năng chính:**
 
-- Lấy thông tin cơ bản về trung tâm như:
-  - **Chính sách**
-  - **Khóa học**
-  - **Lịch thi**
-  - **Lệ phí**
-  - **Thủ tục đăng ký**
-  - **Nội dung đào tạo**
-  - **Ưu đãi**
-- Hỗ trợ chatbot trả lời câu hỏi **chính xác** và **nhanh chóng**.
+- Truy xuất thông tin về:
+  - Chính sách
+  - Khóa học
+  - Lịch thi
+  - Lệ phí
+  - Thủ tục đăng ký
+  - Nội dung đào tạo
+  - Ưu đãi
+- Hỗ trợ chatbot trả lời nhanh, chính xác các câu hỏi khách hàng.
 
 ---
 
 ## Quy tắc xử lý truy vấn người dùng
 
-1. **Sửa lỗi chính tả** nếu người dùng nhập sai.
-2. Các từ sau được xem là **tương đương**:
-   - `CNTT`, `Tin học`, `công nghệ thông tin` → **Chuyển tất cả thành:** `công nghệ thông tin`
-     - **Không cần ghi**: `cơ bản` hay `nâng cao`
-   - `Học phí`, `lệ phí` → **Chuyển tất cả thành:** `lệ phí`
-   - `Liên kết`, `đường dẫn`, `link` → **Chuyển tất cả thành:** `liên kết`
+1. **Chỉnh sửa lỗi chính tả** tự động trước khi tìm kiếm.
+2. **Chuẩn hóa từ khóa**:
+   - `CNTT` / `Tin học` → `công nghệ thông tin`
+   - `Học phí` → `lệ phí`
+   - `Liên kết` / `link` → `liên kết`
+3. **Loại bỏ** các từ không cần thiết (`cơ bản`, `nâng cao`) khi tìm chủ đề “công nghệ thông tin”.
+4. **Phân đoạn truy vấn** nếu quá dài, giữ từng cụm từ khóa chính.
+5. Trả về kết quả dạng **bullet** ngắn gọn, dễ đọc.

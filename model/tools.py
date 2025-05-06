@@ -11,7 +11,6 @@ from langchain_mongodb.vectorstores import MongoDBAtlasVectorSearch  # Hỗ tr�
 from langchain_core.vectorstores import VectorStoreRetriever  # Xử lý tìm kiếm trên vector store
 
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
-from langchain_core.tools import Tool
 
 import pathlib
 
@@ -29,9 +28,9 @@ MONGO_DB_FULLTEXT_INDEX = os.getenv('MONGO_DB_VECTOR_INDEX')
 
 # Lấy ra prompt và description
 system_prompt = pathlib.Path("model/prompts/system_prompt.md").read_text(encoding='utf-8')
+system_prompt_hoc_vien = pathlib.Path("model/prompts/system_prompt_hoc_vien.md").read_text(encoding='utf-8')
+
 description_RAG_tool = pathlib.Path("model/prompts/description_RAG_tool.md").read_text(encoding='utf-8')
-description_SQL_guide_tool = pathlib.Path("model/prompts/description_SQL_guide_tool.md").read_text(encoding='utf-8')
-SQL_guide_prompt = pathlib.Path("model/prompts/SQL_guide_prompt.md").read_text(encoding='utf-8')
 
 @st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
 def initialize_vector_search() -> MongoDBAtlasVectorSearch:
@@ -82,10 +81,6 @@ def get_mongodb_retriever() -> VectorStoreRetriever:
         return None
 
 @st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
-def sql_db_guide(_input: str) -> str:
-    return SQL_guide_prompt 
-
-@st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
 def get_llm_and_agent():
     """
     Khởi tạo Language Model và Agent, sau đó cache trong 24 giờ.
@@ -106,18 +101,7 @@ def get_llm_and_agent():
             description=description_RAG_tool
         )
 
-        # Tạo công cụ hướng dẫn SQL toolkit
-        SQL_guide = Tool.from_function(
-            func=sql_db_guide,
-            name="GuideSQLDatabaseTool",
-            description=description_SQL_guide_tool
-        )
-
-        Bigquery_db = get_BigQuery_engine()
-
-        toolkit = SQLDatabaseToolkit(db=Bigquery_db, llm=llm_model)
-
-        tools =  [retriever_tool] + [SQL_guide] + toolkit.get_tools() # Danh sách công cụ cho agent
+        tools =  [retriever_tool] # Danh sách công cụ cho agent
         # Tạo agent với model và tools
         agent_executor = create_react_agent(model=llm_model, tools=tools, prompt=system_prompt)
 
@@ -128,4 +112,38 @@ def get_llm_and_agent():
         print(f"Lỗi khởi tạo agent: {str(e)}")
         return None
 
+@st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
+def get_llm_and_agent_hoc_vien():
+    """
+    Khởi tạo Language Model và Agent, sau đó cache trong 24 giờ.
+    - MONGO_DB_COLLECTION_NAME: Tên collection trong MongoDB.
+    """
+    try:
+        llm_model = initialize_llm_model()
 
+        retriever = get_mongodb_retriever()  # Lấy retriever
+
+        if retriever is None:
+            st.error("Không thể khởi tạo agent do lỗi retriever")
+            return None
+        # Tạo công cụ tìm kiếm cho agent
+        retriever_tool = create_retriever_tool(
+            retriever=retriever,
+            name='RAG',
+            description=description_RAG_tool
+        )
+
+        Bigquery_db = get_BigQuery_engine()
+
+        toolkit = SQLDatabaseToolkit(db=Bigquery_db, llm=llm_model)
+
+        tools =  [retriever_tool] + toolkit.get_tools() # Danh sách công cụ cho agent
+        # Tạo agent với model và tools
+        agent_executor = create_react_agent(model=llm_model, tools=tools, prompt=system_prompt_hoc_vien)
+
+        return agent_executor
+
+    except Exception as e:
+        st.error(f"Lỗi khởi tạo agent: {str(e)}")
+        print(f"Lỗi khởi tạo agent: {str(e)}")
+        return None

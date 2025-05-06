@@ -8,7 +8,7 @@ from view.interface import setup_page, setup_sidebar, setup_chat_interface, setu
 from view.dialog import setup_log_in_dialog, setup_feedback_dialog
 
 from model.database import initialize_firebase  # Khởi tạo Firebase
-from model.tools import get_llm_and_agent  # Khởi tạo agent
+from model.tools import get_llm_and_agent, get_llm_and_agent_hoc_vien  # Khởi tạo agent
 
 from controller.chat_controller import handle_user_input, handle_user_input_with_employee  # Xử lý input
 from controller.cookie import get_cookie_data, setup_cookie_data
@@ -51,9 +51,12 @@ def main():
             setup_log_in_dialog()
 
     # Khởi tạo agent nếu chưa có
-    # if "agent_executor" not in st.session_state:
-    st.session_state.agent_executor = get_llm_and_agent()  
-        
+    if "agent_executor" not in st.session_state:
+        if not st.session_state.get('user_info', {}).get('la_hoc_vien', True):
+            st.session_state.agent_executor = get_llm_and_agent()
+        elif st.session_state.get('user_info', {}).get('la_hoc_vien', False):
+            st.session_state.agent_executor = get_llm_and_agent_hoc_vien()
+            
     if "agent_history" in st.session_state and not st.session_state.get('gap_nhan_vien', False):
         st.session_state.agent_history = setup_chat_interface()  # Thiết lập giao diện chat
         
