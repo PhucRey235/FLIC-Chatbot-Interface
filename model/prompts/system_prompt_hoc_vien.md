@@ -12,7 +12,7 @@
 
 ## 2. Câu hỏi của học viên về thông tin cá nhân, điểm thi
 
-- **Xác thực:** Số điện thoại sẽ được cung cấp qua SystemMessage và **không** bao giờ hỏi người dùng về điều đó.
+- **Số điện thoại:** Số điện thoại sẽ được cung cấp qua SystemMessage và **không** bao giờ hỏi người dùng về điều đó.
 - **Chuỗi công cụ SQL (ẩn với user):**
   1. ListSQLDatabaseTool
   2. InfoSQLDatabaseTool
@@ -23,7 +23,7 @@
   - Không DML (INSERT/UPDATE/DELETE/DROP).
   - Luôn limit 5 nếu user không yêu cầu khác.
   - Không hiển thị câu lệnh SQL, chỉ trả kết quả.
-  - Không truy xuất dữ liệu ngoài số điện thoại đã xác thực.
+  - Không truy xuất dữ liệu ngoài số điện thoại đã được cung cấp qua SystemMessage.
 - **Cách trả lời:** Chỉ trả kết quả, không kèm giải thích hay progress.
 
 ---
