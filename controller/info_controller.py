@@ -41,7 +41,7 @@ def khoi_tao_customized_prompt(phone, job, name):
     thong_tin_hoc_vien = get_thong_tin_hoc_vien(phone)
  
     if thong_tin_hoc_vien:
-        customized_prompt = f"Tôi là {thong_tin_hoc_vien.get('name', 'người dùng ẩn danh')}. Tôi là học viên của FLIC. Mã định danh của tôi là: {thong_tin_hoc_vien.get('phone', '')}. Các khóa học tôi tham gia: {thong_tin_hoc_vien.get('course', '')}. Hôm nay là ngày {datetime.now().strftime('%d/%m/%Y')}."
+        st.session_state.customized_prompt = f"Tôi là {thong_tin_hoc_vien.get('name', 'người dùng ẩn danh')}. Tôi là học viên của FLIC. Mã định danh của tôi là: {thong_tin_hoc_vien.get('phone', '')}. Các khóa học tôi tham gia: {thong_tin_hoc_vien.get('course', '')}. Hôm nay là ngày {datetime.now().strftime('%d/%m/%Y')}."
         
         # Lưu thông tin vào session_state
         user_info = {
@@ -52,7 +52,7 @@ def khoi_tao_customized_prompt(phone, job, name):
         }
 
     else:
-        customized_prompt =  f"Tôi là {name if name else 'người dùng ẩn danh'}. Tôi không phải là học viên của FLIC. Hôm nay là ngày {datetime.now().strftime('%d/%m/%Y')}" 
+        st.session_state.customized_prompt =  f"Tôi là {name if name else 'người dùng ẩn danh'}. Tôi không phải là học viên của FLIC. Hôm nay là ngày {datetime.now().strftime('%d/%m/%Y')}" 
         
         # Lưu thông tin vào session_state
         user_info = {
@@ -62,7 +62,7 @@ def khoi_tao_customized_prompt(phone, job, name):
             'la_hoc_vien': False,
         }
         
-    return customized_prompt, user_info
+    return st.session_state.customized_prompt, user_info
         
 
 def transform_cloudinary_url(url, transformation="c_fit,w_300,h_300,ar_1:1,q_auto,f_auto"):

@@ -57,9 +57,9 @@ def handle_user_input():
             start_time = time.time()
             
             # Chuẩn bị tin nhắn gửi cho agent
-            summarized_message = [SystemMessage(content=st.session_state.id_session_dict.get('customized_prompt', ''))]
+            summarized_message = [SystemMessage(content=st.session_state.customized_prompt)]
             summarized_message.extend(st.session_state.agent_history)
-            
+            st.write(st.session_state.customized_prompt)
             # Gọi agent để lấy phản hồi
             output = st.session_state.agent_executor.invoke({"messages": summarized_message})
             response = output["messages"][-1].content  # Lấy phản hồi cuối cùng
