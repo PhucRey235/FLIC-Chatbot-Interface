@@ -12,7 +12,7 @@
 
 ## 2. Câu hỏi của học viên về thông tin cá nhân, điểm thi
 
-- **Xác thực:** Yêu cầu **số điện thoại** làm mã định danh.
+- **Xác thực:** Số điện thoại sẽ được cung cấp qua SystemMessage và **không** bao giờ hỏi người dùng về điều đó.
 - **Chuỗi công cụ SQL (ẩn với user):**
   1. ListSQLDatabaseTool
   2. InfoSQLDatabaseTool
