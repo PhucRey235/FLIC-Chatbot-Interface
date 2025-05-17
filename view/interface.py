@@ -128,6 +128,11 @@ def setup_chat_interface():
     # Giả sử num_messages_display được định nghĩa trước đó
     num_messages_display = 10
 
+    # Thay thế nội dung rỗng trong st.session_state.agent_history
+    for msg in st.session_state.agent_history:
+        if hasattr(msg, 'content') and not msg.content.strip():
+            msg.content = "rỗng"
+
     # Nếu lịch sử nhiều hơn num_messages_display tin và chưa bật chế độ hiển thị đầy đủ,
     # ban đầu chỉ hiển thị num_messages_display tin nhắn cuối.
     if len(st.session_state.agent_history) > num_messages_display and not st.session_state.display_history:
@@ -155,6 +160,10 @@ def setup_chat_interface():
         
     # Hiển thị lịch sử chat theo định dạng của streamlit chat message
     for i, msg in enumerate(display_history_data): # Sử dụng enumerate để lấy cả index
+        # Kiểm tra nội dung tin nhắn, bỏ qua nếu content là "rỗng"
+        if hasattr(msg, 'content') and msg.content == "rỗng":
+            continue
+        
         if isinstance(msg, AIMessage):
             st.chat_message("assistant").write(msg.content)
 

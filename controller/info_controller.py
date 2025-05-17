@@ -1,11 +1,14 @@
 import streamlit as st
 import ast
 import random
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from google.api_core.exceptions import NotFound
 from firebase_admin import firestore  # Cấu hình và truy cập Firestore
 
 from model.database import get_BigQuery_engine
+
+import pathlib
+from datetime import datetime
 
 @st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
 def get_thong_tin_hoc_vien(phone):
@@ -14,15 +17,15 @@ def get_thong_tin_hoc_vien(phone):
 
     # Danh sách cột
     columns = [
-        'student_id', 'name', 'email', 'enrollment_date', 'phone',
-        'birth_date', 'gender', 'course', 'level', 'status'
+        'idHocVien', 'MaSV', 'Ho', 'Ten', 'NgaySinh',
+        'GioiTinh', 'DienThoai', 'Email', 'NgayHoc'
     ]
 
     # Truy vấn
     query = f"""
         SELECT {', '.join(columns)}
-        FROM students
-        WHERE phone = '{phone}'
+        FROM HocVien
+        WHERE DienThoai = '{phone}'
         LIMIT 1
     """
     
@@ -37,23 +40,19 @@ def get_thong_tin_hoc_vien(phone):
         return {}
     
 @st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
-def khoi_tao_customized_prompt(phone, job, name):
+def khoi_tao_user_info(phone, job, name):
     thong_tin_hoc_vien = get_thong_tin_hoc_vien(phone)
  
-    if thong_tin_hoc_vien:
-        st.session_state.customized_prompt = f"Tôi là {thong_tin_hoc_vien.get('name', 'người dùng ẩn danh')}. Tôi là học viên của FLIC. Mã định danh của tôi là: {thong_tin_hoc_vien.get('phone', '')}. Các khóa học tôi tham gia: {thong_tin_hoc_vien.get('course', '')}. Hôm nay là ngày {datetime.now().strftime('%d/%m/%Y')}."
-        
+    if thong_tin_hoc_vien:        
         # Lưu thông tin vào session_state
         user_info = {
-            'name': thong_tin_hoc_vien.get('name', 'người dùng ẩn danh'),
+            'name': f"{thong_tin_hoc_vien.get('Ho', '')} {thong_tin_hoc_vien.get('Ten', 'người dùng ẩn danh')}",
             'phone': phone,
             'job': 'Học viên FLIC',
             'la_hoc_vien': True,
         }
 
     else:
-        st.session_state.customized_prompt =  f"Tôi là {name if name else 'người dùng ẩn danh'}. Tôi không phải là học viên của FLIC. Hôm nay là ngày {datetime.now().strftime('%d/%m/%Y')}" 
-        
         # Lưu thông tin vào session_state
         user_info = {
             'name': name,
@@ -62,9 +61,23 @@ def khoi_tao_customized_prompt(phone, job, name):
             'la_hoc_vien': False,
         }
         
-    return st.session_state.customized_prompt, user_info
+    return user_info
         
+def khoi_tao_system_prompt():
+    if not st.session_state.get('user_info', {}).get('la_hoc_vien', True):
+        system_prompt = pathlib.Path("model/prompts/system_prompt_khac.md").read_text(encoding='utf-8')
+        
+        system_prompt_filled = system_prompt.replace("{thoi_gian_hien_tai}", datetime.now().strftime("%d/%m/%Y %H:%M"))
 
+    if st.session_state.get('user_info', {}).get('la_hoc_vien', False):
+        system_prompt = pathlib.Path("model/prompts/system_prompt_hoc_vien.md").read_text(encoding='utf-8')
+
+        system_prompt_filled = system_prompt.replace("{so_dien_thoai}", st.session_state.get('user_info', {}).get('phone', ''))
+        system_prompt_filled = system_prompt_filled.replace("{thoi_gian_hien_tai}", datetime.now().strftime("%d/%m/%Y %H:%M"))
+         
+    return system_prompt_filled
+        
+        
 def transform_cloudinary_url(url, transformation="c_fit,w_300,h_300,ar_1:1,q_auto,f_auto"):
     if "res.cloudinary.com" in url and "/upload/" in url:
         return url.replace("/upload/", f"/upload/{transformation}/")
@@ -148,7 +161,7 @@ def display_likert_image(category: str = 'nghiem_tuc'):
     )        
     
 def save_feedback(feedback_type, feedback_content):
-    current_time = datetime.now(timezone.utc).isoformat()
+    current_time = (datetime.now(timezone.utc)
     feedbacks_ref = st.session_state.firebase_db.collection("feedbacks").document(st.session_state.get('id_session_dict', {}).get('userID', ''))
     
     feedback_data = {
@@ -182,7 +195,7 @@ def save_yeu_cau_nhan_vien(loi_nhan_tu_dong):
     """
     Lưu tin nhắn vào Firebase Firestore và cập nhật thông tin userchats sử dụng batch.
     """
-    current_time = datetime.now(timezone.utc).isoformat()
+    current_time = (datetime.now(timezone.utc)
     
     # Tham chiếu đến các document
     users_ref = st.session_state.firebase_db.collection("users").document(st.session_state.get('id_session_dict', {}).get('userID', '')) 
@@ -299,7 +312,7 @@ def save_tat_yeu_cau_nhan_vien():
     """
     Lưu tin nhắn vào Firebase Firestore và cập nhật thông tin userchats sử dụng batch.
     """
-    current_time = datetime.now(timezone.utc).isoformat()
+    current_time = (datetime.now(timezone.utc)
     
     # Tham chiếu đến các document
     chat_list_ref = st.session_state.firebase_db.collection("chatList").document(st.session_state.get('id_session_dict', {}).get('conversationID', ''))

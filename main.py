@@ -52,10 +52,12 @@ def main():
 
     # Khởi tạo agent nếu chưa có
     if "agent_executor" not in st.session_state:
-        # if not st.session_state.get('user_info', {}).get('la_hoc_vien', True):
-        #     st.session_state.agent_executor = get_llm_and_agent()
-        # elif st.session_state.get('user_info', {}).get('la_hoc_vien', False):
-        st.session_state.agent_executor = get_llm_and_agent_hoc_vien()
+        if not st.session_state.get('user_info', {}).get('la_hoc_vien', True):
+            st.session_state.agent_executor = get_llm_and_agent()
+
+        if st.session_state.get('user_info', {}).get('la_hoc_vien', False):
+            st.session_state.agent_executor = get_llm_and_agent_hoc_vien()
+
             
     if "agent_history" in st.session_state and not st.session_state.get('gap_nhan_vien', False):
         st.session_state.agent_history = setup_chat_interface()  # Thiết lập giao diện chat

@@ -133,10 +133,6 @@ def get_mongodb_retriever() -> VectorStoreRetriever:
         return None
     
 
-    
-    
-    
-
 # Hệ thống prompt hướng dẫn chatbot
 system_prompt = ("""
 Bạn là một trợ lý ảo được trang bị các công cụ RAG và SQL Toolkit (Chỉ dành cho học viên đối với SQL Toolkit) để hỗ trợ khách hàng của Trung tâm Tiếng Anh FLIC. Hãy trả lời các câu hỏi một cách trang trọng và cung cấp thông tin chính xác về trung tâm.

@@ -1,10 +1,10 @@
 import streamlit as st  # Dùng để hiển thị lỗi và cache resource
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from google.api_core.exceptions import NotFound
 from firebase_admin import firestore  # Cấu hình và truy cập Firestore
 
 def save_welcome_message_to_firebase(welcome_message, id_session_dict, user_info, agent_history):
-    current_time = datetime.now(timezone.utc).isoformat()
+    current_time = (datetime.now(timezone.utc)
     
     # Tham chiếu đến các document
     users_ref = st.session_state.firebase_db.collection("users").document(id_session_dict.get('userID', '')) 
@@ -85,7 +85,7 @@ def save_message_to_firebase(response, response_usage, user_input):
     """
     Lưu tin nhắn vào Firebase Firestore và cập nhật thông tin userchats sử dụng batch.
     """
-    current_time = datetime.now(timezone.utc).isoformat()
+    current_time = (datetime.now(timezone.utc)
     
     # Tham chiếu đến các document
     users_ref = st.session_state.firebase_db.collection("users").document(st.session_state.get('id_session_dict', {}).get('userID', '')) 
@@ -220,7 +220,7 @@ def save_message_to_firebase_with_employee(user_input):
     """
     Lưu tin nhắn vào Firebase Firestore và cập nhật thông tin userchats sử dụng batch.
     """
-    current_time = datetime.now(timezone.utc).isoformat()
+    current_time = (datetime.now(timezone.utc)
     
     # Tham chiếu đến các document
     users_ref = st.session_state.firebase_db.collection("users").document(st.session_state.get('id_session_dict', {}).get('userID', '')) 

@@ -39,30 +39,6 @@ credentials_dict = {
     "universe_domain": UNIVERSE_DOMAIN_BQ,
 }
 
-# Bảng mock cho học viên (students)
-# Dữ liệu mở rộng cho bảng học viên
-students_data = pd.DataFrame({
-    'student_id': [1, 2, 3, 4, 5],
-    'name': ['Nguyễn Văn A', 'Trần Thị B', 'Lê Văn C', 'Phạm Minh D', 'Hoàng Thị E'],
-    'email': ['vana@example.com', 'thib@example.com', 'venc@example.com', 'minhd@example.com', 'thie@example.com'],
-    'enrollment_date': ['2023-01-15', '2023-02-20', '2023-03-10', '2023-04-01', '2023-05-12'],
-    'phone': ['0909123456', '0911223344', '0922334455', '0933445566', '0944556677'],
-    'birth_date': ['1999-08-01', '2000-04-15', '1998-11-20', '2001-07-10', '2002-12-30'],
-    'gender': ['Nam', 'Nữ', 'Nam', 'Nam', 'Nữ'],
-    'course': ['TOEIC A', 'IELTS B', 'TOEIC A', 'Cambridge C1', 'IELTS B'],
-    'level': ['Beginner', 'Intermediate', 'Beginner', 'Advanced', 'Intermediate'],
-    'status': ['Đang học', 'Đã tốt nghiệp', 'Đang học', 'Đã tốt nghiệp', 'Đang học']
-})
-
-# Dữ liệu mở rộng cho bảng kết quả thi
-test_results_data = pd.DataFrame({
-    'result_id': [101, 102, 103, 104, 105, 106, 107],
-    'student_id': [1, 2, 3, 1, 4, 5, 2],
-    'test_type': ['TOEIC', 'IELTS', 'TOEIC', 'IELTS', 'Cambridge', 'IELTS', 'TOEIC'],
-    'score': [850, 6.5, 920, 7.0, 180, 7.5, 700],
-    'test_date': ['2024-05-01', '2024-06-15', '2024-07-20', '2024-08-10', '2024-09-05', '2024-10-12', '2024-12-01']
-})
-
 # Đường dẫn tới file credential
 CREDENTIALS_PATH = "credentials.json"
 
@@ -72,30 +48,298 @@ credentials = service_account.Credentials.from_service_account_info(credentials_
 # Khởi tạo client BigQuery
 client = bigquery.Client(credentials=credentials, project=credentials_dict['project_id'])
 
+import pandas as pd
+import random
+from datetime import datetime, timedelta
+from unidecode import unidecode
+
+random.seed(42)
+current_date = datetime.now().date()
+
+# HocVien
+last_names = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Vũ', 'Đặng', 'Bùi', 'Đỗ', 'Phan']
+middle_names = ['Văn', 'Thị', 'Minh', 'Hữu', 'Thành', 'Quốc', 'Ngọc', 'Tuấn', 'Út', 'Anh']
+first_names = ['An', 'Bình', 'Chi', 'Dung', 'Hương', 'Kiệt', 'Lan', 'My', 'Phúc', 'Quỳnh',
+               'Quang', 'Sơn', 'Thảo', 'Trang', 'Hạnh', 'Loan', 'Mai', 'Nam', 'Oanh', 'Phương',
+               'Tâm', 'Uyên', 'Vy', 'Xuân', 'Yến', 'Khánh', 'Hải', 'Giang', 'Đức', 'Hồ']
+
+# Giả sử có 30 sinh viên, ta muốn khoảng 60% đủ điều kiện thi
+num_students = 30
+pct_eligible = 0.6
+eligible_indices = set(random.sample(range(num_students), int(num_students * pct_eligible)))
+
+students = []
+for i in range(num_students):
+    # Nếu i trong nhóm đủ điều kiện, enroll cách current_date 14–40 ngày
+    if i in eligible_indices:
+        enroll = current_date - timedelta(days=random.randint(14, 40))
+    else:
+        # Nhóm còn lại: enroll trong khoảng 0–13 ngày (chưa đủ 2 tuần)
+        enroll = current_date - timedelta(days=random.randint(0, 13))
+    dob = datetime(
+        random.randint(2003, 2006),
+        random.randint(1, 12),
+        random.randint(1, 28)
+    ).date()
+    gender = random.choice(['Nam','Nữ'])
+    fn = first_names[i]
+    phone = f"09{random.randint(10000000,99999999)}"
+    ma_sv = f"2111240{str(random.randint(0, 30)).zfill(2)}{random.randint(1, 3)}{str(random.randint(0, 40)).zfill(2)}"
+
+    students.append({
+        'idHocVien': i+1,
+        'MaSV': ma_sv,
+        'Ho': f"{random.choice(last_names)} {random.choice(middle_names)}",
+        'Ten': fn,
+        'NgaySinh': dob.strftime('%Y-%m-%d'),
+        'GioiTinh': gender,
+        'DienThoai': phone,
+        'Email': f"{ma_sv}@due.udn.vn",
+        'NgayHoc': enroll.strftime('%Y-%m-%d')
+    })
+
+# Tiếp tục như bình thường: dựng df_HocVien từ students
+df_HocVien = pd.DataFrame(students).astype({
+    'idHocVien':'int32','MaSV':'string','Ho':'string','Ten':'string',
+    'NgaySinh':'string','GioiTinh':'string','DienThoai':'string','Email':'string','NgayHoc':'string'
+})
+
+# HocVien_Lop
+hocvien_lop = []
+for i, sv in enumerate(students):
+    id_lop = 1 if i < len(students)//2 else 2  # nửa đầu là CB, nửa sau là NC
+    hocvien_lop.append({
+        'idHocVien_lop': sv['idHocVien'],
+        'idHocVien': sv['idHocVien'],
+        'idLop': id_lop,
+        'SoTienKhuyenMai': random.choice([0,500000,1000000]),
+        'NgayXepLop': (datetime.strptime(sv['NgayHoc'],'%Y-%m-%d')+timedelta(days=1)).date().strftime('%Y-%m-%d')
+    })
+    
+df_HocVien_Lop = pd.DataFrame(hocvien_lop).astype({
+    'idHocVien_lop':'int32','idHocVien':'int32','idLop':'int32',
+    'SoTienKhuyenMai':'int64','NgayXepLop':'string'
+})
+
+# Lịch thi & Phòng thi
+lich, phong = [], []
+lid = pid = 1
+for svl in hocvien_lop:
+    nh = datetime.strptime(df_HocVien.loc[df_HocVien['idHocVien']==svl['idHocVien'],'NgayHoc'].iat[0], '%Y-%m-%d').date()
+    if current_date >= nh + timedelta(weeks=2):
+        ngkt = (nh + timedelta(weeks=2)).strftime('%Y-%m-%d')
+        lich.append({'idLichThi':lid,'idKhoaThi':1 if svl['idLop']==1 else 2,
+                     'BuoiThi':'Sáng','NgayThi':ngkt,'GioThi':'08:00-10:00'})
+        phong.append({'idPhongThi':pid,'idKhoaThi':1 if svl['idLop']==1 else 2,
+                      'PhongThi':f'Phòng {100+pid}','idLichThi':lid,'idCapDo':svl['idLop']})
+        lid+=1; pid+=1
+
+df_LichThi = pd.DataFrame(lich).astype({
+    'idLichThi':'int32','idKhoaThi':'int32','BuoiThi':'string',
+    'NgayThi':'string','GioThi':'string'
+})
+df_PhongThi = pd.DataFrame(phong).astype({
+    'idPhongThi':'int32','idKhoaThi':'int32','PhongThi':'string',
+    'idLichThi':'int32','idCapDo':'int32'
+})
+
+# KhóaThi_ThiSinh & Điểm
+kts, dt_nc, dt_cb = [], [], []
+idx = 1
+for svl in hocvien_lop:
+    nh = datetime.strptime(df_HocVien.loc[df_HocVien['idHocVien']==svl['idHocVien'],'NgayHoc'].iat[0], '%Y-%m-%d').date()
+    if current_date >= nh + timedelta(weeks=2):
+        # Tìm lịch thi gần nhất khớp idKhoaThi và idCapDo (vì mỗi học viên có thể có ngày học khác nhau)
+        matching_lich = df_LichThi[df_LichThi['idKhoaThi'] == svl['idLop']]
+        matching_phong = df_PhongThi[(df_PhongThi['idKhoaThi'] == svl['idLop']) & (df_PhongThi['idCapDo'] == svl['idLop'])]
+
+        if not matching_lich.empty and not matching_phong.empty:
+            rec_lich = matching_lich.iloc[0]
+            rec_phong = matching_phong.iloc[0]
+
+            exam_date = datetime.strptime(rec_lich['NgayThi'],'%Y-%m-%d').date() + timedelta(weeks=2)
+            done = current_date >= exam_date
+
+            entry = {
+                'idKhoaThi_ThiSinh': idx,
+                'idKhoaThi': rec_lich['idKhoaThi'],
+                'idHocVien_Lop': svl['idHocVien_lop'],
+                'idCapDo': svl['idLop'],
+                'idPhongThi': rec_phong['idPhongThi'],  # 🔁 dùng id phòng thi
+                'VangThi': False,
+                'Xeploai': None,
+                'SoHieuChungChi': f'CNTT-{idx:03d}'
+            }
+
+            if done:
+                if svl['idLop']==1:
+                    lt, th = round(random.uniform(0,10), 1), round(random.uniform(0,10), 1)
+                    passed = lt>=5 and th>=5
+                    entry['Xeploai'] = 'Đạt' if passed else 'Không đạt'
+                    dt_nc.append({'idDiemThi':idx,'idKhoaThi_ThiSinh':idx,
+                                'LT_Word':lt,'TH_Word':th,
+                                'LT_Excel':random.uniform(0,10),'TH_Excel':random.uniform(0,10),
+                                'LT_PP':random.uniform(0,10),'TH_PP':random.uniform(0,10)})
+                else:
+                    lt, th = round(random.uniform(0,10), 1), round(random.uniform(0,10), 1)
+                    passed = lt>=5 and th>=5
+                    entry['Xeploai'] = 'Đạt' if passed else 'Không đạt'
+                    dt_cb.append({'idDiemThi':idx,'idKhoaThi_ThiSinh':idx,
+                                'LyThuyet':lt,'ThucHanh':th})
+            kts.append(entry)
+            idx+=1
+
+df_KhoaThi_ThiSinh = pd.DataFrame(kts).astype({
+    'idKhoaThi_ThiSinh':'int32','idKhoaThi':'int32','idHocVien_Lop':'int32',
+    'idCapDo':'int32','idPhongThi':'int32','VangThi':'bool',
+    'Xeploai':'string','SoHieuChungChi':'string'
+})
+df_DiemThiNC = pd.DataFrame(dt_nc, columns=['idDiemThi','idKhoaThi_ThiSinh','LT_Word','TH_Word',
+                                            'LT_Excel','TH_Excel','LT_PP','TH_PP']).astype({
+    'idDiemThi':'int32','idKhoaThi_ThiSinh':'int32','LT_Word':'float64','TH_Word':'float64',
+    'LT_Excel':'float64','TH_Excel':'float64','LT_PP':'float64','TH_PP':'float64'
+})
+df_DiemThiCB = pd.DataFrame(dt_cb, columns=['idDiemThi','idKhoaThi_ThiSinh','LyThuyet','ThucHanh']).astype({
+    'idDiemThi':'int32','idKhoaThi_ThiSinh':'int32','LyThuyet':'float64','ThucHanh':'float64'
+})
+
+
 # Cấu hình thông tin dataset và bảng
 dataset_id = "FLIC_ThongTinSinhVien"  # Thay bằng tên dataset bạn đã tạo trên BigQuery
-students_table_id = f"{credentials_dict['project_id']}.{dataset_id}.students"
-results_table_id = f"{credentials_dict['project_id']}.{dataset_id}.test_results"
 
-# Gửi dữ liệu students lên BigQuery
-job_students = client.load_table_from_dataframe(
-    students_data,
-    students_table_id,
-    job_config=bigquery.LoadJobConfig(
-        write_disposition="WRITE_TRUNCATE",  # Ghi đè dữ liệu cũ
+# Xóa toàn bộ bảng trong dataset
+tables = client.list_tables(dataset_id)
+for table in tables:
+    table_id = f"{dataset_id}.{table.table_id}"
+    client.delete_table(table_id, not_found_ok=True)
+    print(f"🗑️ Đã xóa bảng: {table_id}")
+
+# Danh sách ánh xạ tên bảng và DataFrame tương ứng
+table_map = {
+    "HocVien": df_HocVien,
+    "HocVien_Lop": df_HocVien_Lop,
+    "SatHachCNTT_LichThi": df_LichThi,
+    "SatHachCNTT_PhongThi": df_PhongThi,
+    "SatHachCNTT_KhoaThi_ThiSinh": df_KhoaThi_ThiSinh,
+    "SatHachCNTT_DiemThiNC": df_DiemThiNC,
+    "SatHachCNTT_DiemThiCB": df_DiemThiCB
+    # Nếu bạn có các bảng: SatHachCNTT_KhoaThi_Lop, SatHachCNTT_DMKhoaThi, SatHachCNTT_ThiSinh_MonThi
+    # thì thêm DataFrame tương ứng vào đây
+}
+
+# Gửi từng bảng lên BigQuery
+for table_name, df in table_map.items():
+    table_id = f"{credentials_dict['project_id']}.{dataset_id}.{table_name}"
+    job = client.load_table_from_dataframe(
+        df,
+        table_id,
+        job_config=bigquery.LoadJobConfig(
+            write_disposition="WRITE_TRUNCATE"
+        )
     )
-)
-job_students.result()  # Đợi job hoàn thành
+    job.result()
+    print(f"✅ Đã tải lên bảng {table_name} ({len(df)} dòng)")
 
-# Gửi dữ liệu test_results lên BigQuery
-job_results = client.load_table_from_dataframe(
-    test_results_data,
-    results_table_id,
-    job_config=bigquery.LoadJobConfig(
-        write_disposition="WRITE_TRUNCATE",
-    )
-)
+print("🎉 Tất cả dữ liệu đã được đẩy lên BigQuery thành công.")
 
-job_results.result()
 
-print("✅ Dữ liệu đã được tải lên BigQuery thành công.")
+# # --- Bổ sung: Thêm thông tin ràng buộc (Constraints Metadata) ---
+
+# # BigQuery không thực thi FK, nhưng cho phép khai báo metadata trong INFORMATION_SCHEMA
+# # Việc khai báo này giúp các công cụ (như AI Agent) hiểu được quan hệ giữa các bảng
+
+# dataset_ref = client.dataset(dataset_id, project=credentials_dict['project_id'])
+
+# print("\n--- Bắt đầu thêm thông tin ràng buộc (metadata) ---")
+
+# # Định nghĩa các câu lệnh ALTER TABLE để thêm Primary Key
+# # Sửa lỗi: Bỏ phần ADD CONSTRAINT tên_constraint vì BigQuery không hỗ trợ đặt tên cho PK metadata
+# pk_statements = [
+#     f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.HocVien`
+#     ADD PRIMARY KEY (idHocVien) NOT ENFORCED
+#     """,
+#     f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.HocVien_Lop`
+#     ADD PRIMARY KEY (idHocVien_lop) NOT ENFORCED
+#     """,
+#      f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_LichThi`
+#     ADD PRIMARY KEY (idLichThi) NOT ENFORCED
+#     """,
+#      f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_PhongThi`
+#     ADD PRIMARY KEY (idPhongThi) NOT ENFORCED
+#     """,
+#     f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_KhoaThi_ThiSinh` -- Sửa lỗi chính tả tên bảng ở đây
+#     ADD PRIMARY KEY (idKhoaThi_ThiSinh) NOT ENFORCED
+#     """,
+#      f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_DiemThiNC`
+#     ADD PRIMARY KEY (idDiemThi) NOT ENFORCED
+#     """,
+#      f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_DiemThiCB`
+#     ADD PRIMARY KEY (idDiemThi) NOT ENFORCED
+#     """,
+# ]
+
+# # Định nghĩa các câu lệnh ALTER TABLE để thêm Foreign Key
+# # Giữ lại ADD CONSTRAINT tên_constraint cho FK vì BigQuery hỗ trợ
+# # Sửa lỗi chính tả tên bảng trong các REFERENCES và tên bảng đang ALTER
+# fk_statements = [
+#     f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.HocVien_Lop`
+#     ADD CONSTRAINT fk_HocVien_Lop_HocVien FOREIGN KEY (idHocVien) REFERENCES `{dataset_ref.project}.{dataset_ref.dataset_id}.HocVien` (idHocVien) NOT ENFORCED
+#     """,
+#     f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_PhongThi`
+#     ADD CONSTRAINT fk_PhongThi_LichThi FOREIGN KEY (idLichThi) REFERENCES `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_LichThi` (idLichThi) NOT ENFORCED
+#     """,
+#     f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_KhoaThi_ThiSinh` -- Sửa lỗi chính tả tên bảng ở đây
+#     ADD CONSTRAINT fk_KTTT_HocVien_Lop FOREIGN KEY (idHocVien_Lop) REFERENCES `{dataset_ref.project}.{dataset_ref.dataset_id}.HocVien_Lop` (idHocVien_lop) NOT ENFORCED -- Lưu ý idHocVien_lop trong HocVien_Lop
+#     """,
+#      f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_KhoaThi_ThiSinh` -- Sửa lỗi chính tả tên bảng ở đây
+#     ADD CONSTRAINT fk_KTTT_PhongThi FOREIGN KEY (idPhongThi) REFERENCES `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_PhongThi` (idPhongThi) NOT ENFORCED
+#     """,
+#     f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_DiemThiNC`
+#     ADD CONSTRAINT fk_DiemThiNC_KTTT FOREIGN KEY (idKhoaThi_ThiSinh) REFERENCES `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_KhoaThi_ThiSinh` (idKhoaThi_ThiSinh) NOT ENFORCED -- Sửa lỗi chính tả tên bảng ở đây
+#     """,
+#      f"""
+#     ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_DiemThiCB`
+#     ADD CONSTRAINT fk_DiemThiCB_KTTT FOREIGN KEY (idKhoaThi_ThiSinh) REFERENCES `{dataset_ref.project}.{dataset_ref.dataset_id}.SatHachCNTT_KhoaThi_ThiSinh` (idKhoaThi_ThiSinh) NOT ENFORCED -- Sửa lỗi chính tả tên bảng ở đây
+#     """,
+#     # Bạn có thể cần thêm các FK khác tùy thuộc vào cấu trúc đầy đủ của các bảng khác
+#     # ví dụ: SatHachCNTT_KhoaThi_ThiSinh.idKhoaThi -> SatHachCNTT_DMKhoaThi.idKhoaThi (nếu có bảng DMKhoaThi)
+#     # HocVien_Lop.idLop -> SatHachCNTT_DMKhoaThi.idKhoaThi (nếu idLop trong HV_Lop là id của khóa học trong bảng DM)
+# ]
+
+# # --- Giữ nguyên phần code thực thi bên dưới ---
+# # Thực thi các câu lệnh thêm PK
+# print("Đang thêm Primary Keys metadata...")
+# for statement in pk_statements:
+#     try:
+#         query_job = client.query(statement)
+#         query_job.result() # Chờ cho đến khi câu lệnh hoàn thành
+#         # Hiển thị câu lệnh đầy đủ hoặc phần dễ đọc để biết cái nào thành công
+#         print(f"✅ Thêm PK thành công: {statement.replace('NOT ENFORCED','').replace(f'ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.','').strip()}")
+#     except Exception as e:
+#         print(f"❌ Lỗi khi thêm PK cho: {statement.replace('NOT ENFORCED','').replace(f'ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.','').strip()} - {e}")
+
+# # Thực thi các câu lệnh thêm FK
+# print("\nĐang thêm Foreign Keys metadata...")
+# for statement in fk_statements:
+#     try:
+#         query_job = client.query(statement)
+#         query_job.result() # Chờ cho đến khi câu lệnh hoàn thành
+#         # Hiển thị câu lệnh đầy đủ hoặc phần dễ đọc để biết cái nào thành công
+#         print(f"✅ Thêm FK thành công: {statement.replace('NOT ENFORCED','').replace(f'ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.','').strip()}")
+#     except Exception as e:
+#         print(f"❌ Lỗi khi thêm FK cho: {statement.replace('NOT ENFORCED','').replace(f'ALTER TABLE `{dataset_ref.project}.{dataset_ref.dataset_id}.','').strip()} - {e}")
+
+
+# print("\n🎉 Đã hoàn thành việc thêm thông tin ràng buộc (metadata) vào BigQuery.")

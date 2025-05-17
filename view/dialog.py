@@ -3,7 +3,7 @@ import re
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, AIMessageChunk, ToolMessage  # Định dạng tin nhắn
 
-from controller.info_controller import khoi_tao_customized_prompt, display_likert_image, save_feedback
+from controller.info_controller import khoi_tao_user_info, display_likert_image, save_feedback
 from controller.chat_controller import get_agent_history_from_firebase
 
 def is_valid_phone(phone):
@@ -65,8 +65,8 @@ def setup_log_in_dialog():
 
             if not has_error:
 
-                # Khởi tạo customized_prompt
-                customized_prompt, user_info = khoi_tao_customized_prompt(phone, job, name)             
+                # Khởi tạo user_info
+                user_info = khoi_tao_user_info(phone, job, name)             
                 
                 # Khởi tạo userID, conversationID, botID 
                 # Đặt log_in_dialog_display thành False để ngăn dialog hiển thị lại
@@ -75,7 +75,6 @@ def setup_log_in_dialog():
                     'conversationID': f"RAG{phone}",
                     'botID': "chatbotRAG_v1.0.0",
                     'log_in_dialog_display': False,
-                    'customized_prompt': customized_prompt.replace("\n", ""),
                 }   
 
                 agent_history = get_agent_history_from_firebase(user_info, id_session_dict)
@@ -85,8 +84,11 @@ def setup_log_in_dialog():
                 st.session_state.id_session_dict = id_session_dict
                 st.session_state.user_info = user_info
                 st.session_state.rating_display = True
-                st.session_state.save_cookie = True
+                # st.session_state.save_cookie = True
                 
+                # if 'agent_executor' in st.session_state:
+                #     del st.session_state['agent_executor']
+                    
                 st.rerun()    
 
 @st.fragment

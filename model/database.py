@@ -9,6 +9,8 @@ from firebase_admin import credentials, firestore  # Cấu hình và truy cập 
 import streamlit as st  # Dùng để hiển thị lỗi và cache resource
 import time  # Tạo timestamp
 
+from google.cloud import bigquery
+from google.oauth2 import service_account
 
 from langchain_community.utilities import SQLDatabase
 from sqlalchemy import create_engine
@@ -115,3 +117,28 @@ def get_BigQuery_engine():
     Bigquery_db = SQLDatabase(engine=engine)
     
     return Bigquery_db        
+
+@st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
+def get_BigQuery():
+    credentials_info = {
+        "type": TYPE_BQ,
+        "project_id": PROJECT_ID_BQ,
+        "private_key_id": PRIVATE_KEY_ID_BQ,
+        "private_key": PRIVATE_KEY_BQ,
+        "client_email": CLIENT_EMAIL_BQ,
+        "client_id": CLIENT_ID_BQ,
+        "auth_uri": AUTH_URI_BQ,
+        "token_uri": TOKEN_URI_BQ,
+        "auth_provider_x509_cert_url": AUTH_PROVIDER_X509_CERT_URL_BQ,
+        "client_x509_cert_url": CLIENT_X509_CERT_URL_BQ,
+        "universe_domain": UNIVERSE_DOMAIN_BQ,
+    }   
+    
+    credentials = service_account.Credentials.from_service_account_info(credentials_info)
+
+    client = bigquery.Client(credentials=credentials, project=credentials_info['project_id'])
+    
+    project_id = credentials_info['project_id']
+    dataset_id = DATASET_ID_BQ # Lấy từ đâu đó
+
+    return client, project_id, dataset_id
