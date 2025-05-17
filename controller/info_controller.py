@@ -161,7 +161,7 @@ def display_likert_image(category: str = 'nghiem_tuc'):
     )        
     
 def save_feedback(feedback_type, feedback_content):
-    current_time = (datetime.now(timezone.utc)
+    current_time = datetime.now(timezone.utc)
     feedbacks_ref = st.session_state.firebase_db.collection("feedbacks").document(st.session_state.get('id_session_dict', {}).get('userID', ''))
     
     feedback_data = {
@@ -195,7 +195,7 @@ def save_yeu_cau_nhan_vien(loi_nhan_tu_dong):
     """
     Lưu tin nhắn vào Firebase Firestore và cập nhật thông tin userchats sử dụng batch.
     """
-    current_time = (datetime.now(timezone.utc)
+    current_time = datetime.now(timezone.utc)
     
     # Tham chiếu đến các document
     users_ref = st.session_state.firebase_db.collection("users").document(st.session_state.get('id_session_dict', {}).get('userID', '')) 
@@ -312,7 +312,7 @@ def save_tat_yeu_cau_nhan_vien():
     """
     Lưu tin nhắn vào Firebase Firestore và cập nhật thông tin userchats sử dụng batch.
     """
-    current_time = (datetime.now(timezone.utc)
+    current_time = datetime.now(timezone.utc)
     
     # Tham chiếu đến các document
     chat_list_ref = st.session_state.firebase_db.collection("chatList").document(st.session_state.get('id_session_dict', {}).get('conversationID', ''))
