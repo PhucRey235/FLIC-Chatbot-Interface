@@ -207,12 +207,12 @@ df_DiemThiCB = pd.DataFrame(dt_cb, columns=['idDiemThi','idKhoaThi_ThiSinh','LyT
 # Cấu hình thông tin dataset và bảng
 dataset_id = "FLIC_ThongTinSinhVien"  # Thay bằng tên dataset bạn đã tạo trên BigQuery
 
-# Xóa toàn bộ bảng trong dataset
-tables = client.list_tables(dataset_id)
-for table in tables:
-    table_id = f"{dataset_id}.{table.table_id}"
-    client.delete_table(table_id, not_found_ok=True)
-    print(f"🗑️ Đã xóa bảng: {table_id}")
+# # Xóa toàn bộ bảng trong dataset
+# tables = client.list_tables(dataset_id)
+# for table in tables:
+#     table_id = f"{dataset_id}.{table.table_id}"
+#     client.delete_table(table_id, not_found_ok=True)
+#     print(f"🗑️ Đã xóa bảng: {table_id}")
 
 # Danh sách ánh xạ tên bảng và DataFrame tương ứng
 table_map = {
