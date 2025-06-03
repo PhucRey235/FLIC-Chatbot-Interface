@@ -30,12 +30,10 @@ def get_thong_tin_hoc_vien(phone):
     """
     
     result = Bigquery_db.run(query)
-    st.session_state.result = result
 
     try:
         result = ast.literal_eval(result)  # Chuyển về list chuẩn
-        result = dict(zip(columns, result[0]))
-        print(result)     
+        result = dict(zip(columns, result[0])) 
         
         return result
         
@@ -104,11 +102,6 @@ def khoi_tao_user_info(phone, job, name):
                 'la_quan_ly': False,
             }
             
-    print(thong_tin_hoc_vien)       
-    print(user_info)    
-    st.write(thong_tin_hoc_vien)
-    st.write(user_info)
-    time.sleep(10)
     return user_info
         
 def transform_cloudinary_url(url, transformation="c_fit,w_300,h_300,ar_1:1,q_auto,f_auto"):
