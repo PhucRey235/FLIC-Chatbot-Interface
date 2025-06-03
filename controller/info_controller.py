@@ -37,10 +37,9 @@ def get_thong_tin_hoc_vien(phone):
     """
     
     result = Bigquery_db.run(query)
-    print(result) 
-    logger.debug("Raw result = %s", result)
-    print(1)
-    # try:
+    st.write(result) 
+    time.sleep(100)
+        # try:
     # result = ast.literal_eval(result)  # Chuyển về list chuẩn
     # result = dict(zip(columns, result[0]))
     # print(result)     
