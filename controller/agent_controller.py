@@ -1,20 +1,18 @@
 import streamlit as st
 import pathlib
 from datetime import datetime
-
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, AIMessageChunk, ToolMessage  # Định dạng tin nhắn
-
-from model.tools import get_agent_for_sinh_vien, get_agent_for_hoc_vien  # Khởi tạo agent
-
-from langchain_google_genai import ChatGoogleGenerativeAI, HarmBlockThreshold, HarmCategory
-from json_repair import repair_json
 from pydantic import BaseModel, Field
 import json
 import time 
 import re
-
 import os
 from dotenv import load_dotenv
+
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, AIMessageChunk, ToolMessage  # Định dạng tin nhắn
+from langchain_google_genai import ChatGoogleGenerativeAI, HarmBlockThreshold, HarmCategory
+
+from model.tools import get_agent_for_sinh_vien, get_agent_for_hoc_vien  # Khởi tạo agent
+
 
 # Load environment variables
 load_dotenv()
