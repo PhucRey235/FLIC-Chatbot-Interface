@@ -43,7 +43,7 @@ def setup_log_in_dialog():
         # name_warning = st.empty()
         
         # Chọn nghề nghiệp
-        job = st.radio("Nghề nghiệp:", options=["Sinh viên","Học viên FLIC", "Khác"], index=None, horizontal = True)
+        job = st.radio("Nghề nghiệp:", options=["Sinh viên","Học viên FLIC", 'Quản lý'], index=None, horizontal = True)
         job_warning = st.empty()
         # Nút gửi
         submit_button = st.form_submit_button(label='Gửi')
@@ -84,10 +84,7 @@ def setup_log_in_dialog():
                 st.session_state.id_session_dict = id_session_dict
                 st.session_state.user_info = user_info
                 st.session_state.rating_display = True
-                # st.session_state.save_cookie = True
-                
-                # if 'agent_executor' in st.session_state:
-                #     del st.session_state['agent_executor']
+                st.session_state.save_cookie = True
                     
                 st.rerun()    
 

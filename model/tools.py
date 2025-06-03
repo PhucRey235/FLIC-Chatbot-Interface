@@ -13,7 +13,7 @@ from langchain_core.vectorstores import VectorStoreRetriever  # Xử lý tìm ki
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 from langchain_community.tools.sql_database.tool import QuerySQLDatabaseTool
 
-from .llm import initialize_embedding, initialize_llm_model
+from .llm import initialize_embedding, initialize_llm_model, initialize_openai_embedding
 from .database import initialize_mongodb, get_BigQuery, get_BigQuery_engine  # Import hàm từ database.py
 from .SQL_tools import BigQueryDescribeTablesTool
 
@@ -38,7 +38,7 @@ def initialize_vector_search() -> MongoDBAtlasVectorSearch:
     - MONGO_DB_COLLECTION_NAME: Tên collection trong MongoDB.
     """
     try:
-        embeddings = initialize_embedding()  # Lấy embedding
+        embeddings = initialize_openai_embedding()  # Lấy embedding
         if embeddings is None:
             return None
         client = initialize_mongodb()  # Lấy kết nối MongoDB
@@ -80,7 +80,7 @@ def get_mongodb_retriever() -> VectorStoreRetriever:
         return None
 
 @st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
-def get_llm_and_agent():
+def get_agent_for_sinh_vien():
     """
     Khởi tạo Language Model và Agent, sau đó cache trong 24 giờ.
     - MONGO_DB_COLLECTION_NAME: Tên collection trong MongoDB.
@@ -112,7 +112,7 @@ def get_llm_and_agent():
         return None
 
 @st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
-def get_llm_and_agent_hoc_vien():
+def get_agent_for_hoc_vien():
     """
     Khởi tạo Language Model và Agent, sau đó cache trong 24 giờ.
     - MONGO_DB_COLLECTION_NAME: Tên collection trong MongoDB.
@@ -137,15 +137,23 @@ def get_llm_and_agent_hoc_vien():
         describe_tool = BigQueryDescribeTablesTool(client=client, project_id=project_id, dataset_id=dataset_id)
 
         query_tool = QuerySQLDatabaseTool(db=get_BigQuery_engine())
-
-        tools =  [retriever_tool, describe_tool, query_tool] # Danh sách công cụ cho agent
         
         # Tạo agent với model và tools
-        agent_executor = create_react_agent(model=llm_model, tools=tools)
-
-        return agent_executor
+        agent_executor_route = create_react_agent(model=llm_model, tools=[])
+        agent_executor_RAG = create_react_agent(model=llm_model, tools=[retriever_tool])
+        agent_executor_SQL = create_react_agent(model=llm_model, tools=[describe_tool, query_tool])
+        
+        return agent_executor_route, agent_executor_RAG, agent_executor_SQL
 
     except Exception as e:
         st.error(f"Lỗi khởi tạo agent: {str(e)}")
         print(f"Lỗi khởi tạo agent: {str(e)}")
         return None
+
+ 
+ 
+ 
+    
+    
+    
+    

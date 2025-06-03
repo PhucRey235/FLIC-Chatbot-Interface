@@ -1,27 +1,18 @@
+# Công cụ RAG truy xuất thông tin khóa học công nghệ thông tin cơ bản và nâng cao, TOEIC
 
-# Công cụ RAG – Tìm Kiếm Thông Tin Trung Tâm (MongoDB)
+## Chức năng chính
 
-**Chức năng chính:**
+- Truy xuất thông tin sau:
+    * Thông tin về chứng chỉ.
+    * Lệ phí đăng ký dự thi và học ôn.
+    * Lịch thi.
+    * Thủ tục và hồ sơ đăng kýdự thi và học ôn.
+    * Thông tin liên hệ.
 
-- Truy xuất thông tin về:
-  - Chính sách
-  - Khóa học
-  - Lịch thi
-  - Lệ phí
-  - Thủ tục đăng ký
-  - Nội dung đào tạo
-  - Ưu đãi
-- Hỗ trợ chatbot trả lời nhanh, chính xác các câu hỏi khách hàng.
-
----
-
-## Quy tắc xử lý truy vấn người dùng
+## Quy tắc tạo truy xuất RAG
 
 1. **Chỉnh sửa lỗi chính tả** tự động trước khi tìm kiếm.
-2. **Chuẩn hóa từ khóa**:
-   - `CNTT` / `Tin học` → `công nghệ thông tin`
-   - `Học phí` → `lệ phí`
-   - `Liên kết` / `link` → `liên kết`
-3. **Loại bỏ** các từ không cần thiết (`cơ bản`, `nâng cao`) khi tìm chủ đề “công nghệ thông tin”.
-4. **Phân đoạn truy vấn** nếu quá dài, giữ từng cụm từ khóa chính.
-5. Trả về kết quả dạng **bullet** ngắn gọn, dễ đọc.
+2. **Chuẩn hóa từ khóa** (chuyển về dạng thống nhất): `CNTT` / `Tin học` / `công nghệ thông tin` / → `công nghệ thông tin .`
+3. Sử dụng nội dung lịch sử đoạn hội thoại giữa Chatbot và người dùng để tạo ra câu truy xuất RAG.
+4. Chuẩn hóa tất cả truy vấn thành **chữ thường** và có dấu tiếng Việt.
+5. Câu truy vấn: `Thông tin cần truy vấn` + `Khóa học cần truy vấn`

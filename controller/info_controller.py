@@ -20,7 +20,7 @@ def get_thong_tin_hoc_vien(phone):
         'idHocVien', 'MaSV', 'Ho', 'Ten', 'NgaySinh',
         'GioiTinh', 'DienThoai', 'Email', 'NgayHoc'
     ]
-
+    
     # Truy vấn
     query = f"""
         SELECT {', '.join(columns)}
@@ -39,44 +39,68 @@ def get_thong_tin_hoc_vien(phone):
     except Exception as e:
         return {}
     
+def get_thong_tin_quan_ly(phone):   
+    if phone == '0123456789':
+        thong_tin_quan_ly = {
+            'Ho': 'Nguyễn Thành',
+            'Ten': 'Thủy',
+            'GioiTinh': 'Nam',
+            'DienThoai': '0123456789',
+        }
+        
+    else:
+        thong_tin_quan_ly = {}
+        
+    return thong_tin_quan_ly
+    
 @st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
 def khoi_tao_user_info(phone, job, name):
-    thong_tin_hoc_vien = get_thong_tin_hoc_vien(phone)
- 
-    if thong_tin_hoc_vien:        
-        # Lưu thông tin vào session_state
-        user_info = {
-            'name': f"{thong_tin_hoc_vien.get('Ho', '')} {thong_tin_hoc_vien.get('Ten', 'người dùng ẩn danh')}",
-            'phone': phone,
-            'job': 'Học viên FLIC',
-            'la_hoc_vien': True,
-        }
+    if job == 'Quản lý':
+        thong_tin_quan_ly = get_thong_tin_quan_ly(phone)
+        if thong_tin_quan_ly:        
+            # Lưu thông tin vào session_state
+            user_info = {
+                'name': f"{thong_tin_quan_ly.get('Ho', '')} {thong_tin_quan_ly.get('Ten', 'người dùng ẩn danh')}",
+                'phone': phone,
+                'job': 'Quản lý',
+                'la_hoc_vien': False,
+                'la_quan_ly': True,
+            }
 
+        else:
+            # Lưu thông tin vào session_state
+            user_info = {
+                'name': name,
+                'phone': phone,
+                'job': job,
+                'la_hoc_vien': False,
+                'la_quan_ly': False,
+            }
+    
     else:
-        # Lưu thông tin vào session_state
-        user_info = {
-            'name': name,
-            'phone': phone,
-            'job': job,
-            'la_hoc_vien': False,
-        }
+        thong_tin_hoc_vien = get_thong_tin_hoc_vien(phone)
+    
+        if thong_tin_hoc_vien:        
+            # Lưu thông tin vào session_state
+            user_info = {
+                'name': f"{thong_tin_hoc_vien.get('Ho', '')} {thong_tin_hoc_vien.get('Ten', 'người dùng ẩn danh')}",
+                'phone': phone,
+                'job': 'Học viên FLIC',
+                'la_hoc_vien': True,
+                'la_quan_ly': False,
+            }
+
+        else:
+            # Lưu thông tin vào session_state
+            user_info = {
+                'name': name,
+                'phone': phone,
+                'job': job,
+                'la_hoc_vien': False,
+                'la_quan_ly': False,
+            }
         
     return user_info
-        
-def khoi_tao_system_prompt():
-    if not st.session_state.get('user_info', {}).get('la_hoc_vien', True):
-        system_prompt = pathlib.Path("model/prompts/system_prompt_khac.md").read_text(encoding='utf-8')
-        
-        system_prompt_filled = system_prompt.replace("{thoi_gian_hien_tai}", datetime.now().strftime("%d/%m/%Y %H:%M"))
-
-    if st.session_state.get('user_info', {}).get('la_hoc_vien', False):
-        system_prompt = pathlib.Path("model/prompts/system_prompt_hoc_vien.md").read_text(encoding='utf-8')
-
-        system_prompt_filled = system_prompt.replace("{so_dien_thoai}", st.session_state.get('user_info', {}).get('phone', ''))
-        system_prompt_filled = system_prompt_filled.replace("{thoi_gian_hien_tai}", datetime.now().strftime("%d/%m/%Y %H:%M"))
-         
-    return system_prompt_filled
-        
         
 def transform_cloudinary_url(url, transformation="c_fit,w_300,h_300,ar_1:1,q_auto,f_auto"):
     if "res.cloudinary.com" in url and "/upload/" in url:

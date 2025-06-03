@@ -3,12 +3,14 @@ import os  # Thư viện xử lý hệ thống
 from dotenv import load_dotenv  # Nạp biến môi trường
 
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings, HarmBlockThreshold, HarmCategory  # Model và embedding từ Google
+from langchain_openai import OpenAIEmbeddings
 
 # Nạp biến môi trường
 load_dotenv()
 
 # API key cho Google Generative AI
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 @st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
 def initialize_embedding(model_name: str = 'models/text-embedding-004') -> GoogleGenerativeAIEmbeddings:
@@ -25,12 +27,26 @@ def initialize_embedding(model_name: str = 'models/text-embedding-004') -> Googl
         return None
 
 @st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
+def initialize_openai_embedding(model_name: str = 'text-embedding-3-large') -> OpenAIEmbeddings: # text-embedding-ada-002
+    # Khởi tạo OpenAIEmbeddings từ langchain
+    try:
+        result = OpenAIEmbeddings(
+            model=model_name,
+            openai_api_key=OPENAI_API_KEY # Hoặc thay bằng API key trực tiếp
+        )
+        return result
+    except Exception as e:
+        # Hiển thị lỗi nếu khởi tạo thất bại
+        st.error(f"Lỗi khởi tạo embedding model: {str(e)}")
+        return None
+
+@st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
 def initialize_llm_model():
     # Tạo model Gemini với các tham số cấu hình
     llm_model = ChatGoogleGenerativeAI(
         model="models/gemini-2.0-flash",  # Model Gemini
-        temperature=0.3,  # Độ sáng tạo (0-1)
-        max_tokens=1000,  # Số token tối đa trong phản hồi
+        temperature=0,  # Độ sáng tạo (0-1)
+        max_tokens=2000,  # Số token tối đa trong phản hồi
         timeout=10,  # Thời gian chờ tối đa
         max_retries=2,  # Số lần thử lại nếu lỗi
         api_key=GOOGLE_API_KEY,

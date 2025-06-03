@@ -8,27 +8,9 @@ from .message_controller import save_message_to_firebase, save_message_to_fireba
 from .on_snapshot_controller import reset_interact_interface
 from .message_controller import save_welcome_message_to_firebase
 
-from .info_controller import khoi_tao_system_prompt
+from .agent_controller import get_answer
 
 def handle_user_input():
-    # if st.session_state.get('agent_history', '') != '':
-    #     raise ValueError("agent_history chưa được khởi tạo")  # Kiểm tra nếu agent_executor là None
-    
-    # if st.session_state.get('agent_executor', '') != '':
-    #     raise ValueError("agent_executor chưa được khởi tạo")  # Kiểm tra nếu agent_executor là None
-    
-    # if st.session_state.get('id_session_dict', {}).get('userID', '') != '':
-    #     raise ValueError("userID chưa được khởi tạo")  # Kiểm tra nếu agent_executor là None
-    
-    # if st.session_state.get('id_session_dict', {}).get('botID', '') != '':
-    #     raise ValueError("botID chưa được khởi tạo")  # Kiểm tra nếu agent_executor là None
-    
-    # if st.session_state.get('id_session_dict', {}).get('conversationID', '') != '':
-    #     raise ValueError("conversationID chưa được khởi tạo")  # Kiểm tra nếu agent_executor là None
-    
-    # if st.session_state.get('firebase_db', '') != '':
-    #     raise ValueError("firebase_db chưa được khởi tạo")  # Kiểm tra nếu agent_executor là None
-    
     """
     Xử lý input từ người dùng và điều phối giữa Model và View.
     - agent_history: Lịch sử chat.
@@ -45,7 +27,6 @@ def handle_user_input():
             st.warning("Vui lòng nhập thông tin người dùng trước khi đặt câu hỏi.")
             return
 
-        system_prompt = khoi_tao_system_prompt()
         # st.write(system_prompt)
         # Sau khi người dùng gửi tin nhắn mới hiển thị lại số sao mới
         st.session_state.rating_display = True
@@ -61,7 +42,7 @@ def handle_user_input():
             start_time = time.time()
             
             # Chuẩn bị tin nhắn gửi cho agent
-            summarized_message = [SystemMessage(content=system_prompt)]
+            
             
             # Đảm bảo agent_history có ít nhất 8 tin nhắn trước khi slice
             if len(st.session_state.agent_history) > 8:
@@ -69,14 +50,11 @@ def handle_user_input():
             else:
                 recent_history = st.session_state.agent_history
             
-            summarized_message.extend(recent_history)
             # st.write(summarized_message)
             # st.write(system_prompt)
             
             # Gọi agent để lấy phản hồi
-            output = st.session_state.agent_executor.invoke({"messages": summarized_message})
-            response = output["messages"][-1].content  # Lấy phản hồi cuối cùng
-            response_usage = output["messages"][-1].usage_metadata
+            response, response_usage = get_answer(recent_history)
             
             st.session_state.agent_history.append(AIMessage(content=response))
             

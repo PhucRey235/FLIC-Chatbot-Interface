@@ -8,7 +8,7 @@ from view.interface import setup_page, setup_sidebar, setup_chat_interface, setu
 from view.dialog import setup_log_in_dialog, setup_feedback_dialog
 
 from model.database import initialize_firebase  # Khởi tạo Firebase
-from model.tools import get_llm_and_agent, get_llm_and_agent_hoc_vien  # Khởi tạo agent
+
 
 from controller.chat_controller import handle_user_input, handle_user_input_with_employee  # Xử lý input
 from controller.cookie import get_cookie_data, setup_cookie_data
@@ -40,8 +40,8 @@ def main():
     if st.session_state.get('id_session_dict', {}).get('log_in_dialog_display', True):
         setup_log_in_dialog()
     
-    if st.session_state.get('save_cookie', False):
-        setup_cookie_data()
+    # if st.session_state.get('save_cookie', False):
+    #     setup_cookie_data()
         
     if (not st.session_state.get('user_info', {}).get('la_hoc_vien', True) 
         and st.session_state.get('user_info', {}).get('job', 'người dùng ẩn danh') == 'Học viên FLIC'):
@@ -50,15 +50,14 @@ def main():
         if st.button("Điền thông tin"):
             setup_log_in_dialog()
 
-    # Khởi tạo agent nếu chưa có
-    if "agent_executor" not in st.session_state:
-        if not st.session_state.get('user_info', {}).get('la_hoc_vien', True):
-            st.session_state.agent_executor = get_llm_and_agent()
+    if (not st.session_state.get('user_info', {}).get('la_quan_ly', True) 
+        and st.session_state.get('user_info', {}).get('job', 'người dùng ẩn danh') == 'Quản lý'):
+        st.warning('Tôi không tìm thấy thông tin quản lý của bạn, bạn có thể sửa lại thông tin')
 
-        if st.session_state.get('user_info', {}).get('la_hoc_vien', False):
-            st.session_state.agent_executor = get_llm_and_agent_hoc_vien()
+        if st.button("Điền thông tin"):
+            setup_log_in_dialog()
 
-            
+
     if "agent_history" in st.session_state and not st.session_state.get('gap_nhan_vien', False):
         st.session_state.agent_history = setup_chat_interface()  # Thiết lập giao diện chat
         

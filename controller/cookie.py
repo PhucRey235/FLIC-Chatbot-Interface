@@ -56,9 +56,6 @@ def get_cookie_data():
     user_info_cookie = get_cookie("user_info")
     id_session_cookie = get_cookie("id_session")
 
-    # if 'agent_executor' in st.session_state:
-    #     del st.session_state['agent_executor']
-
     if user_info_cookie:
         try:
             user_info = json.loads(user_info_cookie)
