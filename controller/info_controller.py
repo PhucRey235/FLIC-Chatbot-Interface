@@ -4,7 +4,7 @@ import random
 from datetime import datetime, timezone, timedelta
 from google.api_core.exceptions import NotFound
 from firebase_admin import firestore  # Cấu hình và truy cập Firestore
-
+import time
 from model.database import get_BigQuery_engine
 
 import pathlib
@@ -99,7 +99,8 @@ def khoi_tao_user_info(phone, job, name):
                 'la_hoc_vien': False,
                 'la_quan_ly': False,
             }
-        
+    st.write(user_info)    
+    time.sleep(1000)
     return user_info
         
 def transform_cloudinary_url(url, transformation="c_fit,w_300,h_300,ar_1:1,q_auto,f_auto"):

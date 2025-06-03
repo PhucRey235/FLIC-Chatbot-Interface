@@ -137,7 +137,7 @@ def get_answer(recent_history):
         if "agent_executor" not in st.session_state:
             st.session_state.agent_executor = get_agent_for_sinh_vien()
             system_prompt_sinh_vien_RAG = pathlib.Path("model/prompts/system_prompt_sinh_vien_RAG.md").read_text(encoding='utf-8')
-        
+            
             st.session_state.system_prompt_sinh_vien_RAG = system_prompt_sinh_vien_RAG.replace("{thoi_gian_hien_tai}", datetime.now().strftime("%d/%m/%Y %H:%M"))
             
         summarized_message = [SystemMessage(content=st.session_state.system_prompt_sinh_vien_RAG)]
