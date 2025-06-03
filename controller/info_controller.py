@@ -10,13 +10,6 @@ from model.database import get_BigQuery_engine
 import pathlib
 from datetime import datetime
 
-import logging
-
-logging.basicConfig(level=logging.DEBUG)  # Cấu hình mức độ log (nếu cần)
-logger = logging.getLogger(__name__)     # Tạo logger
-
-
-
 @st.cache_resource(ttl=24*3600, max_entries=1, show_spinner=False)
 def get_thong_tin_hoc_vien(phone):
     # Lấy kết nối BigQuery
