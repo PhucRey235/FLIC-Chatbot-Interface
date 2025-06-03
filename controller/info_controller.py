@@ -31,6 +31,7 @@ def get_thong_tin_hoc_vien(phone):
     
     result = Bigquery_db.run(query)
     print(result) 
+    print(1)
     # try:
     # result = ast.literal_eval(result)  # Chuyển về list chuẩn
     # result = dict(zip(columns, result[0]))
