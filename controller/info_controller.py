@@ -30,14 +30,16 @@ def get_thong_tin_hoc_vien(phone):
     """
     
     result = Bigquery_db.run(query)
-    
-    try:
-        result = ast.literal_eval(result)  # Chuyển về list chuẩn
-        return dict(zip(columns, result[0]))
+    print(result) 
+    # try:
+    result = ast.literal_eval(result)  # Chuyển về list chuẩn
+    result = dict(zip(columns, result[0]))
+    print(result) 
+    return result
         
-    # Không phải là Học viên FLIC, trả về rỗng
-    except Exception as e:
-        return {}
+    # # Không phải là Học viên FLIC, trả về rỗng
+    # except Exception as e:
+    #     return {}
     
 def get_thong_tin_quan_ly(phone):   
     if phone == '0123456789':
@@ -99,8 +101,10 @@ def khoi_tao_user_info(phone, job, name):
                 'la_hoc_vien': False,
                 'la_quan_ly': False,
             }
-    st.write(user_info)    
-    time.sleep(1000)
+            
+    print(thong_tin_hoc_vien)       
+    print(user_info)    
+
     return user_info
         
 def transform_cloudinary_url(url, transformation="c_fit,w_300,h_300,ar_1:1,q_auto,f_auto"):
