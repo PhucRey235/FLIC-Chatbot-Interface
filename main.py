@@ -80,5 +80,7 @@ def main():
         # Xử lý input người dùng
         handle_user_input()
         
+    st.write(st.session_state.result)
+        
 if __name__ == "__main__":
     main()  # Chạy ứng dụng
