@@ -36,7 +36,7 @@ def get_thong_tin_hoc_vien(phone):
     # result = ast.literal_eval(result)  # Chuyển về list chuẩn
     # result = dict(zip(columns, result[0]))
     # print(result)     
-    return result
+    # return result
         
     # # Không phải là Học viên FLIC, trả về rỗng
     # except Exception as e:
