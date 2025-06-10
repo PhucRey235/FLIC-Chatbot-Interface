@@ -10,7 +10,9 @@ from controller.chat_controller import get_agent_history_from_firebase
 from model.sms_OTP import send_OTP, send_OTP_test
 
 def is_valid_phone(phone):
-    return re.fullmatch(r"\d{10,11}", phone) is not None  # SĐT phải có 10-11 chữ số
+    if phone is None or not isinstance(phone, str) or not phone:
+        return False  # Handles None, non-strings, and empty strings
+    return re.fullmatch(r"\d{10,11}", phone) is not None
 
 def is_valid_email(email):
     return re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email) is not None  # Định dạng email cơ bản
@@ -172,6 +174,10 @@ def setup_log_in_dialog():
 
             if phone and not is_valid_phone(phone):
                 phone_warning.warning("Số điện thoại không hợp lệ.")
+                has_error = True
+                
+            if not phone:
+                phone_warning.warning("Vui lòng điền số điện thoại.")
                 has_error = True
 
             if not has_error:
