@@ -112,7 +112,7 @@ def get_answer(recent_history):
 
             if json_response['su_dung_tool'] == 'RAG':
                 noi_dung_truy_van_tool = json_response['noi_dung_truy_van_tool']
-                st.write(noi_dung_truy_van_tool)
+                # st.write(noi_dung_truy_van_tool)
                 summarized_message = [SystemMessage(content=st.session_state.system_prompt_hoc_vien_RAG)]
                 summarized_message.append(HumanMessage(content=noi_dung_truy_van_tool)) 
                 
@@ -131,7 +131,7 @@ def get_answer(recent_history):
                 
                 output = st.session_state.agent_executor_SQL.invoke({"messages": summarized_message})    
                 
-                st.write(output)
+                # st.write(output)
 
                 response = output["messages"][-1].content  # Lấy phản hồi cuối cùng
                 response_usage = output["messages"][-1].usage_metadata

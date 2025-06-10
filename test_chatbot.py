@@ -213,7 +213,7 @@ def handle_user_input():
                     text_container.markdown(full_response)
                     time.sleep(0.005)  # Delay 0.02 giây giữa các từ
                                 
-            st.write(output)    
+            # st.write(output)    
 
 def setup_chat_interface():
     """

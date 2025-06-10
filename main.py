@@ -40,8 +40,8 @@ def main():
     if st.session_state.get('id_session_dict', {}).get('log_in_dialog_display', True):
         setup_log_in_dialog()
     
-    # if st.session_state.get('save_cookie', False):
-    #     setup_cookie_data()
+    if st.session_state.get('save_cookie', False):
+        setup_cookie_data()
         
     if (not st.session_state.get('user_info', {}).get('la_hoc_vien', True) 
         and st.session_state.get('user_info', {}).get('job', 'người dùng ẩn danh') == 'Học viên FLIC'):

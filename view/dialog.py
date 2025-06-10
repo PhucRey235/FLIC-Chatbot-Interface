@@ -67,7 +67,7 @@ def setup_log_in_dialog_with_OTP():
 
         if st.session_state.get('gui_ma_OTP', False):
             phone_warning.success("Đã gửi mã xác nhận đến số điện thoại này")
-            st.write(st.session_state.ma_OTP_tao_ra)
+            # st.write(st.session_state.ma_OTP_tao_ra)
             if st.button("Xác nhận"):
                 # Thêm kiểm tra để đảm bảo ma_OTP không rỗng và có thể chuyển đổi thành số nguyên
                 if ma_OTP.isdigit(): # Kiểm tra xem chuỗi có phải là số không
