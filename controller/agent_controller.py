@@ -136,8 +136,8 @@ def get_answer(recent_history):
                 response = output["messages"][-1].content  # Lấy phản hồi cuối cùng
                 response_usage = output["messages"][-1].usage_metadata
                             
-                st.write(response)
-                time.sleep(100)
+                # st.write(response)
+                # time.sleep(100)
                               
                 return response, response_usage
                          
