@@ -93,13 +93,22 @@ def get_answer(recent_history):
         
         else:        
             if json_response['tu_choi'] == 1:
-                return "Xin lỗi, tôi không thể thực thi yêu cầu đó.", response_usage
+                return "Hiện tại trung tâm chỉ tổ chức thi TOEIC phối hợp với IIG. Nếu bạn quan tâm luyện thi TOEIC, chúng tôi sẵn sàng hỗ trợ.", response_usage
             
             elif json_response['tu_choi'] == 2:
                 return "Hiện tại, chức năng tra cứu thông tin cá nhân cho khóa học TOEIC chưa được hỗ trợ trực tuyến.", response_usage
             
             elif json_response['tu_choi'] == 3:
-                return "Hiện tại trung tâm chỉ tổ chức thi TOEIC phối hợp với IIG. Nếu bạn quan tâm luyện thi TOEIC, chúng tôi sẵn sàng hỗ trợ.", response_usage
+                return "Xin lỗi, tôi không thể thực thi yêu cầu đó.", response_usage
+
+            elif json_response['tu_choi'] == 4:
+                return "Xin lỗi, tôi không thể thực thi yêu cầu đó.", response_usage
+            
+            elif json_response['tu_choi'] == 5:
+                return "Xin lỗi, tôi không thể thực thi yêu cầu đó.", response_usage
+            
+            elif json_response['tu_choi'] == 6:
+                return "Xin lỗi, tôi không thể thực thi yêu cầu đó.", response_usage
 
             if json_response['su_dung_tool'] == 'RAG':
                 noi_dung_truy_van_tool = json_response['noi_dung_truy_van_tool']
