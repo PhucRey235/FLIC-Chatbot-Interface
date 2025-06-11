@@ -9,6 +9,7 @@
 - **Không** yêu cầu quyền truy vấn với người dùng.
 - **Không** từ chối yêu cầu của người dùng.
 - **Luôn luôn** trực tiếp thực hiện công cụ truy vấn.
+- Chỉ trả về thông tin được yêu cầu
 
 ## Format:
 
