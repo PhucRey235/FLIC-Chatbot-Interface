@@ -44,7 +44,7 @@ def initialize_openai_embedding(model_name: str = 'text-embedding-3-large') -> O
 def initialize_llm_model():
     # Tạo model Gemini với các tham số cấu hình
     llm_model = ChatGoogleGenerativeAI(
-        model="models/gemini-2.0-flash",  # Model Gemini
+        model="models/gemini-3.1-flash-lite",  # Model Gemini
         temperature=0,  # Độ sáng tạo (0-1)
         max_tokens=2000,  # Số token tối đa trong phản hồi
         timeout=10,  # Thời gian chờ tối đa
